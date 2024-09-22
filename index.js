@@ -58,7 +58,7 @@ app.post("/addJoke", (req, res) => {
 
   if (text && type) {
 
-    const newId = jokes.length > 0 ? Math.max(...jokes.map(joke => joke.id)) + 1 : 1;
+    const newId = jokes.length + 1;
     
     const newJoke = {
       id: newId,
@@ -80,8 +80,52 @@ app.post("/addJoke", (req, res) => {
 });
 
 //5. PUT a joke
+app.put("/replace/:id", (req, res) => {
+
+  const text = req.body.text;
+  const type = req.body.type;
+  const id = parseInt(req.params.id);
+  const joke = jokes.find(j => j.id === id);
+
+  if (joke) {
+
+    joke.jokeText = text;
+    joke.jokeType = type;
+
+    res.json({ joke });
+    
+  } else {
+    res.status(404).json({ error: "Joke id not found." });
+  }
+
+});
 
 //6. PATCH a joke
+app.patch("/update/:id", (req, res) => {
+
+  const text = req.body.text;
+  const type = req.body.type;
+  const id = parseInt(req.params.id);
+  const joke = jokes.find(j => j.id === id);
+
+  if (joke) {
+
+    if (text) {
+      joke.jokeText = text;
+    } else if (type) {
+      joke.jokeType = type;
+    } else if (text && type) {
+      joke.jokeText = text;
+      joke.jokeType = type;
+    }
+
+    res.json({ joke });
+    
+  } else {
+    res.status(404).json({ error: "Joke id not found." });
+  }
+
+});
 
 //7. DELETE Specific joke
 
