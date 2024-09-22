@@ -52,6 +52,32 @@ app.get("/filter", (req, res) => {
 });
 
 //4. POST a new joke
+app.post("/addJoke", (req, res) => {
+  const text = req.body.text;
+  const type = req.body.type;
+
+  if (text && type) {
+
+    const newId = jokes.length > 0 ? Math.max(...jokes.map(joke => joke.id)) + 1 : 1;
+    
+    const newJoke = {
+      id: newId,
+      jokeText: text,
+      jokeType: type
+    }
+
+    jokes.push(newJoke);
+
+    res.json({ newJoke });
+
+  } else if (!text) {
+    res.status(404).json({ error: "Joke text missing!" });
+  } else if (!type) {
+    res.status(404).json({ error: "Joke type missing!" });
+  } else {
+    res.status(404).json({ error: "Joke not added due to an error." });
+  }
+});
 
 //5. PUT a joke
 
