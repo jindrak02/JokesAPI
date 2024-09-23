@@ -110,14 +110,9 @@ app.patch("/update/:id", (req, res) => {
 
   if (joke) {
 
-    if (text) {
-      joke.jokeText = text;
-    } else if (type) {
-      joke.jokeType = type;
-    } else if (text && type) {
-      joke.jokeText = text;
-      joke.jokeType = type;
-    }
+    // Pokud je k dispozici proměnná text, nahradíme jí jokeText, pokud dostupná není, ponecháme původní jokeText
+    joke.jokeText = text || joke.jokeText;
+    joke.jokeType = type || joke.jokeType;
 
     res.json({ joke });
     
@@ -128,8 +123,41 @@ app.patch("/update/:id", (req, res) => {
 });
 
 //7. DELETE Specific joke
+app.delete("/delete/:id", (req, res) => {
+  const jokeId = parseInt(req.params.id);
+
+  const jokeToDelete = jokes.findIndex(j => j.id === jokeId);
+
+  jokes.splice(jokeToDelete, 1);
+
+  if (jokeToDelete !== -1) {
+    res.json({ message: "Joke with id " + jokeId + " succesfully deleted." });
+  } else {
+    res.status(404).json({ error: "Joke id not found." });
+  }
+
+});
 
 //8. DELETE All jokes
+app.delete("/deleteAll", (req, res) => {
+  const key = req.query.key;
+
+  if (key) {
+
+    console.log(key);
+    
+    if (key === masterKey) {
+      jokes = [];
+      res.json({ message: "All jokes succesfully deleted." });
+    } else {
+      res.status(404).json({ error: "Authentification failed." });
+    }
+
+  } else {
+    res.status(404).json({ error: "Unauthorized." });
+  }
+
+});
 
 app.listen(port, () => {
   console.log(`Successfully started server on port ${port}.`);
